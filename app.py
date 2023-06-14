@@ -1,5 +1,5 @@
-from flask import Flask, render_template, jsonify
-from database import load_jobs_from_db, load_job_from_db
+from flask import Flask, render_template, jsonify, request
+from database import load_jobs_from_db, load_job_from_db, add_application_to_db
 
 app = Flask(__name__)
 
@@ -49,6 +49,19 @@ def show_job(id):
     return "Not Found", 404
   return render_template('jobpage.html', job=job)
 
+
+@app.route("/job/<id>/apply", methods=["POST"])
+def apply_to_job(id):
+
+  #request.args stores data when sent with method Get.
+  # data = request.args
+  #request.form stores data when sent with method Post.
+  data = request.form
+  # return jsonify(data)
+  job = load_job_from_db(id)
+  add_application_to_db(id, data)
+  return render_template('application_submitted.html',
+                         application=data, job=job)
 
 if __name__ == '__main__':
   app.run(host='0.0.0.0', debug=True)
